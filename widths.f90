@@ -2,20 +2,28 @@
 ! calculate the ANC (and widths) from K. Nollett PRC 86, 044330 (2012), eqn. 35
 
    program widths
+   use constants
+   use channels
+   use gwf
+   use totwf
    implicit none
-   real*8 energy,ke,hbc,mu,const,mu1,mu2,K,partsum,Ca,gamma
-   real*8 temp,m,rad(3)
-   integer N,io,nlines,npoles,i,j,l,narg,Knum,channum,nchan
-   character(len=10) temp2,filename,file(99)
-   real*8, allocatable :: channelwf(:,:)
-   real*8, allocatable :: epole(:)
-   real*8, allocatable :: pots(:)
-   real*8, allocatable :: wf(:,:)
-   real*8, allocatable :: chi(:,:)
+   !real*8 energy,ke,hbc,mu,const,mu1,mu2,K,partsum,Ca,gamma
+   !real*8 temp,m,rad(3)
+   !integer N,io,nlines,npoles,i,j,l,narg,Knum,channum,nchan
+   !character(len=10) temp2,filename,file(99)
+   !real*8, allocatable :: channelwf(:,:)
+   !real*8, allocatable :: epole(:)
+   !real*8, allocatable :: pots(:)
+   !real*8, allocatable :: wf(:,:)
+   !real*8, allocatable :: chi(:,:)
+   real*8 partsum,Ca,gamma,temp,rad(3)
+   integer io,nlines,i,j,l,narg,Knum,nchan
+   character (len=10) temp2,file(99)
    
    ! read file name from input line (#K.wf)
    narg = IARGC()
    call getarg(1,filename)
+   print*, filename
    ! get the number of the channel
    Knum = index(filename,'K')
    read(filename(:Knum-1),*) channum
@@ -26,14 +34,14 @@
    m = 931.49432d0
    ! this is specifically for n+n+14Be
    mu = 2.d0*14.d0*m/16.d0
-   !print *, hbc,m,mu
+   print *, hbc,m,mu
    
    ! read in energy (scattering energy)
    open(unit=7,file="smatrix.txt")
    read(7,*) energy, ke
    rewind(7)
    close(7)
-   !print *, energy, ke
+   print *, energy, ke
    
    ! read input file (filename) to get number of radial points
    open(unit=8,file=filename)
@@ -45,7 +53,7 @@
    enddo 
    print *, rad(1),rad(2),rad(3)
    N = int(rad(1)/(rad(1)-rad(3)))
-   !print *, N
+   print *, N
    rewind(8)
    close(8)
    
@@ -89,7 +97,8 @@
 	 enddo 
       enddo
       ! construct the total wave function \chi for each channel, i
-      call totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,file(i),channum,i,N,nchan)
+      !call totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,file(i),channum,i,N,nchan)
+      call totalwf(file(i),channum,i,nchan)
       ! put each \chi into matrix holding all wave functions
       do j=1,N
          chi(j,1) = wf(j,1)
@@ -106,7 +115,8 @@
    ! pseudo potentials
    ! pot = \sum _gamma prime V_{gamma gamma prime} chi_gamma prime
    allocate(pots(400))
-   call potsum(channum,pots,chi,N,nchan)
+   !call potsum(channum,pots,chi,N,nchan)
+   call potsum(nchan)
       
    ! deallocate channelwf
    !deallocate (channelwf)

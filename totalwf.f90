@@ -60,25 +60,32 @@
    return   
    end function sh
    
-   subroutine totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,filename,cn,cnprime,N,nchan)
+   !subroutine totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,filename,cn,cnprime,N,nchan)
+   subroutine totalwf(ifile,cn,cnprime,nchan)
+   use constants
+   use channels
+   use gwf
    implicit none
-   integer, intent(in) :: npoles,cn,cnprime,N,nchan
-   real*8, intent(in) :: energy,mu,hbc,ke
-   real*8, intent(in) :: channelwf(N,npoles+1)
-   real*8, intent(in) :: epole(npoles)
-   real*8, intent(inout) :: wf(N,2)
-   integer i,j,io,m,p(npoles),ival
-   real*8 S,K,temppole,tempwf(N,2),const
+   integer, intent(in) :: cn,cnprime,nchan
+   !integer, intent(in) :: npoles,cn,cnprime,N,nchan
+   !real*8, intent(in) :: energy,mu,hbc,ke
+   !real*8, intent(in) :: channelwf(N,npoles+1)
+   !real*8, intent(in) :: epole(npoles)
+   !real*8, intent(inout) :: wf(N,2)
+   integer i,j,io,p(npoles),ival
+   real*8 S,temppole,tempwf(N,2),con
    complex*8 hsh,sh,compwf(N)
-   character(len=10) files(nchan),file,filename
+   character(len=10) files(nchan),file,ifile !filename
    complex*8, allocatable :: Ap(:)
+   
+   print *, hbc,m,energy,ke,mu
     
    ! calculate total wave function
    ! Nuclear Reactions for Astrophysics IJ Thompson, FM Nunes
    ! Eqn's (6.5.34) and (6.5.35)
    open(unit=7,file="totalwf.txt",access="append")
-   write(7,*) "#",filename,K
-   print *, filename
+   write(7,*) "#",ifile,K
+   print *, ifile
    
    open(unit=10,file="wfpoleref.txt",status="replace")
    ! calculate Ap
@@ -125,12 +132,12 @@
 	 end if 
       enddo 
       close(11)
-      const = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
-      if (file==filename) then
-         Ap(ival) = Ap(ival) + const*tempwf(N,2)*hsh(ke,tempwf(N,1),K,cn)
+      con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
+      if (file==ifile) then
+         Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(ke,tempwf(N,1),K,cn)
 	 !print *, hsh(ke,tempwf(N,1),K,cn)
       else 
-         Ap(ival) = Ap(ival) + const*tempwf(N,2)*sh(ke,tempwf(N,1),K,cn,cnprime)
+         Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(ke,tempwf(N,1),K,cn,cnprime)
 	 !print *, sh(ke,tempwf(N,1),K,cn,cnprime)
       end if 
       !print *, Ap(ival), tempwf(N,2), epole(ival)

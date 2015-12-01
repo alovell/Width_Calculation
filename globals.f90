@@ -2,27 +2,25 @@
    
 !--------------------------------- Constants throughout the program
    module constants
-   parameter(hbc=197.32705d0)
-   real*8 ke,mu,const,mu1,mu2,m
+   !parameter(hbc=197.32705d0)
+   !parameter(m=931.49432d0)
+   real*8 energy,ke,mu,const,mu1,mu2,hbc,m
    end module constants
 !--------------------------------- Channel descriptors
    module channels
-   implicit none
    integer channum,N
    real*8 K
    character(len=10) filename
    end module channels
 !--------------------------------- Channel wavefunctions
    module gwf
-   implicit none
    real*8, allocatable :: channelwf(:,:)
    real*8, allocatable :: wf(:,:)
    real*8, allocatable :: epole(:)
    integer npoles
    end module gwf
 !--------------------------------- Total wavefunction
-   module totalwf
-   implicit none
+   module totwf
    real*8, allocatable :: pots(:)
    real*8, allocatable :: chi(:,:)
-   end module totalwf
+   end module totwf
