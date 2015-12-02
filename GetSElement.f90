@@ -1,6 +1,8 @@
-   subroutine getS(K,Sr,Si,cn,cnp)
+   !subroutine getS(K,Sr,Si,cn,cnp)
+   subroutine getS(Sr,Si,cn,cnp)
+   use channels
    implicit none
-   real*8, intent(in) :: K
+   !real*8, intent(in) :: K
    integer, intent(in) :: cn,cnp
    real*8, intent(inout) :: Sr,Si
    integer m
@@ -21,6 +23,5 @@
 	 !print *, Si,cn,cnp,"Imaginary"
       end if 
    enddo 
-   
    
    end subroutine getS

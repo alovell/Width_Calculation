@@ -129,7 +129,8 @@
    ! perform the intergration
    ! using Simpson's Rule 
    partsum = 0
-   call simpsons(partsum,chi,pots,energy,ke,hbc,mu,filename,channum,N,nchan)
+   !call simpsons(partsum,chi,pots,energy,ke,hbc,mu,filename,channum,N,nchan)
+   call simpsons(partsum,nchan)
    
    ! deallocate chi
    !deallocate (chi)

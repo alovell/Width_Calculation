@@ -1,8 +1,11 @@
-   complex function hsh(ke,rho,K,cn)
    ! eventually need channel # for S
    ! calculat hmprime - S*hpprime
+   complex function hsh(rho,cn)
+   use constants
+   use channels
    implicit none
-   real*8, intent(in) :: ke,rho,K
+   !real*8, intent(in) :: ke,rho,K
+   real*8, intent(in) :: rho
    integer, intent(in) :: cn
    real*8 S,rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
@@ -20,7 +23,7 @@
    ihpp = fcp(2)
    
    ! get S matrix element (diagonal)
-   call getS(K,Sr,Si,cn,cn)
+   call getS(Sr,Si,cn,cn)
    
    !hsh = rhmp - S*rhpp
    !hsh = rhmp - Sr*rhpp + Si*ihpp
@@ -28,12 +31,15 @@
    
    return   
    end function hsh
-   
-   complex function sh(ke,rho,K,cn,cnp)
+
    ! eventually need channel # for S
    ! calculat - S*hpprime
+   complex function sh(rho,cn,cnp)
+   use constants
+   use channels
    implicit none
-   real*8, intent(in) :: ke,rho,K
+   !real*8, intent(in) :: ke,rho,K
+   real*8, intent(in) :: rho
    integer, intent(in) :: cn,cnp
    real*8 S,rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
@@ -51,7 +57,7 @@
    ihpp = fcp(2)
    
    ! get S matrix element (not diagonal)
-   call getS(K,Sr,Si,cn,cnp)
+   call getS(Sr,Si,cn,cnp)
    
    !sh = -2*rhpp
    !sh = -Sr*rhpp + Si*ihpp
@@ -59,19 +65,13 @@
    
    return   
    end function sh
-   
-   !subroutine totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,filename,cn,cnprime,N,nchan)
+
    subroutine totalwf(ifile,cn,cnprime,nchan)
    use constants
    use channels
    use gwf
    implicit none
    integer, intent(in) :: cn,cnprime,nchan
-   !integer, intent(in) :: npoles,cn,cnprime,N,nchan
-   !real*8, intent(in) :: energy,mu,hbc,ke
-   !real*8, intent(in) :: channelwf(N,npoles+1)
-   !real*8, intent(in) :: epole(npoles)
-   !real*8, intent(inout) :: wf(N,2)
    integer i,j,io,p(npoles),ival
    real*8 S,temppole,tempwf(N,2),con
    complex*8 hsh,sh,compwf(N)
@@ -134,11 +134,13 @@
       close(11)
       con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
       if (file==ifile) then
-         Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(ke,tempwf(N,1),K,cn)
-	 !print *, hsh(ke,tempwf(N,1),K,cn)
+         !Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(ke,tempwf(N,1),K,cn)
+	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn)
+	 !print *, hsh(tempwf(N,1),cn)
       else 
-         Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(ke,tempwf(N,1),K,cn,cnprime)
-	 !print *, sh(ke,tempwf(N,1),K,cn,cnprime)
+         !Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(ke,tempwf(N,1),K,cn,cnprime)
+	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(tempwf(N,1),cn,cnprime)
+	 !print *, sh(tempwf(N,1),cn,cnprime)
       end if 
       !print *, Ap(ival), tempwf(N,2), epole(ival)
    enddo 
