@@ -7,18 +7,33 @@
    use gwf
    use totwf
    implicit none
-   !real*8 energy,ke,hbc,mu,const,mu1,mu2,K,partsum,Ca,gamma
-   !real*8 temp,m,rad(3)
-   !integer N,io,nlines,npoles,i,j,l,narg,Knum,channum,nchan
-   !character(len=10) temp2,filename,file(99)
-   !real*8, allocatable :: channelwf(:,:)
-   !real*8, allocatable :: epole(:)
-   !real*8, allocatable :: pots(:)
-   !real*8, allocatable :: wf(:,:)
-   !real*8, allocatable :: chi(:,:)
-   real*8 partsum,Ca,gamma,temp,rad(3)
-   integer io,nlines,i,j,l,narg,Knum,nchan
+   real*8 partsum,Ca,gamma,temp,rad(3),mass1,mass2
+   integer io,nlines,i,j,l,narg,Knum,nchan,npot,schan
    character (len=10) temp2,file(99)
+   character (len=20) sfile
+   
+   namelist/nuclei/mass1,mass2
+   namelist/files/sfile,filename
+   namelist/chaninfo/nchan,npot,schan
+   
+   ! default values for namelist objects
+   sfile = "smatrix.txt"
+   filename = "1K.wf"
+   mass1 = 1.d0
+   mass2 = 14.d0
+   nchan = 1
+   npot = 400
+   schan = 110
+   
+   ! read namelists
+   !read(5,nml=nuclei)
+   !print *, mass1,mass2
+   !read(5,nml=files)
+   !print *, sfile,filename
+   !read(5,nml=chaninfo)
+   !print *, nchan,npot,schan
+   
+   !filename = Kfile
    
    ! read file name from input line (#K.wf)
    narg = IARGC()
@@ -27,7 +42,7 @@
    ! get the number of the channel
    Knum = index(filename,'K')
    read(filename(:Knum-1),*) channum
-   !print *, Knum, channum
+   print *, Knum, channum
    
    ! constants
    hbc = 197.32705d0
@@ -115,7 +130,6 @@
    ! pseudo potentials
    ! pot = \sum _gamma prime V_{gamma gamma prime} chi_gamma prime
    allocate(pots(400))
-   !call potsum(channum,pots,chi,N,nchan)
    call potsum(nchan)
       
    ! deallocate channelwf
@@ -129,11 +143,10 @@
    ! perform the intergration
    ! using Simpson's Rule 
    partsum = 0
-   !call simpsons(partsum,chi,pots,energy,ke,hbc,mu,filename,channum,N,nchan)
    call simpsons(partsum,nchan)
    
    ! deallocate chi
-   !deallocate (chi)
+   deallocate (chi)
    
    Ca = const * partsum
    

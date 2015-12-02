@@ -1,0 +1,15 @@
+&nuclei
+mass1 = 1
+mass2 = 14
+/
+
+&files
+sfile = 'smatrix.txt'
+filename = '1K.wf'
+/
+
+&chaninfo
+nchan = 5
+npot = 400
+schan = 110
+/

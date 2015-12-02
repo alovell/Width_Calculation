@@ -38,7 +38,6 @@
    use constants
    use channels
    implicit none
-   !real*8, intent(in) :: ke,rho,K
    real*8, intent(in) :: rho
    integer, intent(in) :: cn,cnp
    real*8 S,rhmp,rhpp,ihmp,ihpp,L,Sr,Si
@@ -134,11 +133,9 @@
       close(11)
       con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
       if (file==ifile) then
-         !Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(ke,tempwf(N,1),K,cn)
 	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn)
 	 !print *, hsh(tempwf(N,1),cn)
       else 
-         !Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(ke,tempwf(N,1),K,cn,cnprime)
 	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(tempwf(N,1),cn,cnprime)
 	 !print *, sh(tempwf(N,1),cn,cnprime)
       end if 
