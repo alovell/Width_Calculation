@@ -6,9 +6,10 @@
    use channels
    use gwf
    use totwf
+   use smat
    implicit none
    real*8 partsum,Ca,gamma,temp,rad(3),mass1,mass2
-   integer io,nlines,i,j,l,narg,Knum,nchan,npot,schan
+   integer io,nlines,i,j,l,narg,Knum,nchan,npot
    character (len=10) temp2,file(99)
    character (len=20) sfile
    
@@ -42,21 +43,21 @@
    ! get the number of the channel
    Knum = index(filename,'K')
    read(filename(:Knum-1),*) channum
-   print *, Knum, channum
+   !print *, Knum, channum
    
    ! constants
    hbc = 197.32705d0
    m = 931.49432d0
    ! this is specifically for n+n+14Be
    mu = 2.d0*14.d0*m/16.d0
-   print *, hbc,m,mu
+   !print *, hbc,m,mu
    
    ! read in energy (scattering energy)
    open(unit=7,file="smatrix.txt")
    read(7,*) energy, ke
    rewind(7)
    close(7)
-   print *, energy, ke
+   !print *, energy, ke
    
    ! read input file (filename) to get number of radial points
    open(unit=8,file=filename)
@@ -66,15 +67,15 @@
       read(8,*,iostat=io) rad(1)
       if (io/=0) exit
    enddo 
-   print *, rad(1),rad(2),rad(3)
+   !print *, rad(1),rad(2),rad(3)
    N = int(rad(1)/(rad(1)-rad(3)))
-   print *, N
+   !print *, N
    rewind(8)
    close(8)
    
    ! read in wave function file
    ! need to figure out how to read this in
-   nchan=5 ! number of channels in FaCE - small while testing
+   nchan=6 ! number of channels in FaCE - small while testing
    
    ! allocate wf (channel wf) and chi (total wf)
    allocate(wf(N,2))
@@ -85,6 +86,9 @@
    open(unit=7,file="totalwf.txt")
    write(7,*) "#wave functions for channel gamma"
    close(7)
+   
+   ! read in the S matrix elements for use in the wave function
+   call readS
    
    ! construct all total wave functions
    do i=1,nchan
@@ -112,7 +116,6 @@
 	 enddo 
       enddo
       ! construct the total wave function \chi for each channel, i
-      !call totalwf(channelwf,npoles,energy,ke,mu,hbc,wf,epole,K,file(i),channum,i,N,nchan)
       call totalwf(file(i),channum,i,nchan)
       ! put each \chi into matrix holding all wave functions
       do j=1,N
@@ -124,21 +127,21 @@
    enddo 
    
    ! deallocate wf since \chi is constructed
-   !deallocate (wf)
+   ! also no longer need S matrix
+   deallocate (wf)
+   !deallocate (S)
+   !deallocate (en_ke)
    
    ! create the potentials
    ! pseudo potentials
    ! pot = \sum _gamma prime V_{gamma gamma prime} chi_gamma prime
    allocate(pots(400))
    call potsum(nchan)
-      
-   ! deallocate channelwf
-   !deallocate (channelwf)
    
    ! constant for Ca
    mu1 = 0.5
    mu2 = mu/m
-   const = 2*mu/(hbc**2*ke*(mu1*mu2)**(1.5))
+   const = 2*mu/(hbc**2*en_ke(2,1)*(mu1*mu2)**(1.5))
    
    ! perform the intergration
    ! using Simpson's Rule 
@@ -151,7 +154,8 @@
    Ca = const * partsum
    
    ! width
-   gamma = ke*(Ca*hbc)**2/mu
+   gamma = en_ke(2,1)*(Ca*hbc)**2/mu
    print *, "gamma=",gamma
+   !print *, en_ke(2,1),ke
 
    end program widths

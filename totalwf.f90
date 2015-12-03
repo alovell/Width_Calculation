@@ -3,19 +3,20 @@
    complex function hsh(rho,cn)
    use constants
    use channels
+   use smat
    implicit none
    !real*8, intent(in) :: ke,rho,K
    real*8, intent(in) :: rho
    integer, intent(in) :: cn
-   real*8 S,rhmp,rhpp,ihmp,ihpp,L,Sr,Si
+   real*8 rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
    double precision, dimension(101) :: fc,gc,fcp,gcp
    ifail=0
    m1=1
    L=K+1.5d0
-   S=0.5d0
+   !S=0.5d0
    
-   call coulfg(ke*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
+   call coulfg(en_ke(2,1)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
    
    rhmp = gcp(2)
    ihmp = -1*fcp(2)
@@ -37,18 +38,19 @@
    complex function sh(rho,cn,cnp)
    use constants
    use channels
+   use smat
    implicit none
    real*8, intent(in) :: rho
    integer, intent(in) :: cn,cnp
-   real*8 S,rhmp,rhpp,ihmp,ihpp,L,Sr,Si
+   real*8 rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
    double precision, dimension(101) :: fc,gc,fcp,gcp
    ifail=0
    m1=1
    L=K+1.5d0
-   S=1.d0
+   !S=1.d0
    
-   call coulfg(ke*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
+   call coulfg(en_ke(2,1)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
    
    rhmp = gcp(2)
    ihmp = -1*fcp(2)
@@ -69,15 +71,17 @@
    use constants
    use channels
    use gwf
+   use smat
    implicit none
    integer, intent(in) :: cn,cnprime,nchan
    integer i,j,io,p(npoles),ival
-   real*8 S,temppole,tempwf(N,2),con
+   real*8 temppole,tempwf(N,2),con
    complex*8 hsh,sh,compwf(N)
    character(len=10) files(nchan),file,ifile !filename
    complex*8, allocatable :: Ap(:)
    
-   print *, hbc,m,energy,ke,mu
+   !print *, hbc,m,energy,ke,mu
+   !print *, hbc,m,en_ke(1,1),en_ke(2,1),mu
     
    ! calculate total wave function
    ! Nuclear Reactions for Astrophysics IJ Thompson, FM Nunes
@@ -131,7 +135,8 @@
 	 end if 
       enddo 
       close(11)
-      con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
+      !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
+      con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-en_ke(1,1)))
       if (file==ifile) then
 	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn)
 	 !print *, hsh(tempwf(N,1),cn)

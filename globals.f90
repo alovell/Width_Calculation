@@ -24,3 +24,9 @@
    real*8, allocatable :: pots(:)
    real*8, allocatable :: chi(:,:)
    end module totwf
+!--------------------------------- S matrix
+   module smat
+   integer schan,nl
+   real*8, allocatable :: S(:,:,:)
+   real*8, allocatable :: en_ke(:,:) 
+   end module smat
