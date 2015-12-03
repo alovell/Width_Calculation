@@ -39,7 +39,7 @@
    ! read file name from input line (#K.wf)
    narg = IARGC()
    call getarg(1,filename)
-   print*, filename
+   !print*, filename
    ! get the number of the channel
    Knum = index(filename,'K')
    read(filename(:Knum-1),*) channum
@@ -75,7 +75,7 @@
    
    ! read in wave function file
    ! need to figure out how to read this in
-   nchan=6 ! number of channels in FaCE - small while testing
+   nchan=4 ! number of channels in FaCE - small while testing
    
    ! allocate wf (channel wf) and chi (total wf)
    allocate(wf(N,2))

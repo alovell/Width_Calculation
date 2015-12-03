@@ -137,6 +137,7 @@
       close(11)
       !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
       con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-en_ke(1,1)))
+      !print *, con
       if (file==ifile) then
 	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn)
 	 !print *, hsh(tempwf(N,1),cn)
@@ -150,11 +151,17 @@
    
    ! calculate total wave function
    wf=0.d0
+   compwf=cmplx(0.d0,0.d0)
    do i=1,N
       wf(i,1) = channelwf(i,1)
+      !print *, channelwf(i,1)
       do j=1,npoles
          !wf(i,2) = wf(i,2) + channelwf(i,j+1)*Ap(j)
 	 compwf(i) = compwf(i) + channelwf(i,j+1)*Ap(j)
+	 !print  *, Ap(j),channelwf(i,j+1),compwf(i)
+	 !print *, Ap(j),channelwf(i,j+1),channelwf(i,j+1)*Ap(j)
+	 !print *, channelwf(i,j+1)*Ap(j)
+	 !print *, compwf(i)
       enddo 
       wf(i,2) = abs(compwf(i))
       write(7,*) wf(i,1), wf(i,2)
