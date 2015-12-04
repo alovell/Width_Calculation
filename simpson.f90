@@ -32,17 +32,8 @@
       do j=1,3
          call coulfg(en_ke(2,ik)*chi(i+j-1,1),0d0,L,L,fc,gc,fcp,gcp,1,0,ifail,m1)
          fn(j) = fc(2)*pots(i)*chi(i+j-1,channum+1)/chi(i+j-1,1)
-	 !print *, fc(2)
       enddo 
       ps = ps + ((chi(i+1,1)-chi(i,1))/3.d0)*(fn(1)+4*fn(2)+fn(3))
    enddo 
-   
-   !ps=0
-   !do i=1,400-1
-   !   call coulfg(ke*cwf(i,1),0d0,L,L,fc,gc,fcp,gcp,1,0,ifail,m1)
-   !   fn(1) = fc(2)*pots(i)*cwf(i,channum+1)/cwf(i,1)
-   !   ps = ps + fn(1)
-   !enddo 
-   !ps = (cwf(i+1,1)-cwf(i,1))*ps/3.d0
    
    end subroutine simpsons

@@ -87,7 +87,7 @@
    ! Nuclear Reactions for Astrophysics IJ Thompson, FM Nunes
    ! Eqn's (6.5.34) and (6.5.35)
    open(unit=7,file="totalwf.txt",access="append")
-   write(7,*) "#",ifile,K
+   write(7,*) "#",ifile,K,en_ke(1,ik)
    print *, ifile
    
    open(unit=10,file="wfpoleref.txt",status="replace")
@@ -137,11 +137,9 @@
 	 end if 
       enddo 
       close(11)
-      !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))   
-   print *, "here",en_ke(1,2)
+      !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))  
       con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-en_ke(1,ik)))
       !print *, con
-      !print *, "here"
       if (file==ifile) then
 	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn,ik)
 	 !print *, hsh(tempwf(N,1),cn,ik)
@@ -163,10 +161,6 @@
       do j=1,npoles
          !wf(i,2) = wf(i,2) + channelwf(i,j+1)*Ap(j)
 	 compwf(i) = compwf(i) + channelwf(i,j+1)*Ap(j)
-	 !print  *, Ap(j),channelwf(i,j+1),compwf(i)
-	 !print *, Ap(j),channelwf(i,j+1),channelwf(i,j+1)*Ap(j)
-	 !print *, channelwf(i,j+1)*Ap(j)
-	 !print *, compwf(i)
       enddo 
       wf(i,2) = abs(compwf(i))
       write(7,*) wf(i,1), wf(i,2)

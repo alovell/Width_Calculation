@@ -88,7 +88,7 @@
    
    ! find the width for every sturmxx energy
    open(unit=14,file="GE.txt")
-   do ik=1,2
+   do ik=1,10
    
    ! allocate wf (channel wf) and chi (total wf)
    allocate(wf(N,2))
@@ -132,7 +132,7 @@
    
    ! deallocate wf since \chi is constructed
    ! also no longer need S matrix
-   deallocate (wf)
+   deallocate(wf)
    !deallocate (S)
    !deallocate (en_ke)
    
@@ -152,8 +152,9 @@
    partsum = 0
    call simpsons(partsum,nchan,ik)
    
-   ! deallocate chi
-   deallocate (chi)
+   ! deallocate chi and pots
+   deallocate(chi)
+   deallocate(pots)
    
    Ca = const * partsum
    
@@ -161,8 +162,7 @@
    gamma = en_ke(2,ik)*(Ca*hbc)**2/mu
    print *, "gamma=",gamma
    !print *, en_ke(2,1),ke
-   write(14,*) gamma, en_ke(1,ik)
-   print *, en_ke(1,2)
+   write(14,*) en_ke(1,ik),gamma
    
    enddo 
    
