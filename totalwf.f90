@@ -1,13 +1,13 @@
    ! eventually need channel # for S
    ! calculat hmprime - S*hpprime
-   complex function hsh(rho,cn)
+   complex function hsh(rho,cn,ik)
    use constants
    use channels
    use smat
    implicit none
    !real*8, intent(in) :: ke,rho,K
    real*8, intent(in) :: rho
-   integer, intent(in) :: cn
+   integer, intent(in) :: cn,ik
    real*8 rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
    double precision, dimension(101) :: fc,gc,fcp,gcp
@@ -16,7 +16,7 @@
    L=K+1.5d0
    !S=0.5d0
    
-   call coulfg(en_ke(2,1)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
+   call coulfg(en_ke(2,ik)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
    
    rhmp = gcp(2)
    ihmp = -1*fcp(2)
@@ -24,7 +24,7 @@
    ihpp = fcp(2)
    
    ! get S matrix element (diagonal)
-   call getS(Sr,Si,cn,cn)
+   call getS(Sr,Si,cn,cn,ik)
    
    !hsh = rhmp - S*rhpp
    !hsh = rhmp - Sr*rhpp + Si*ihpp
@@ -35,13 +35,13 @@
 
    ! eventually need channel # for S
    ! calculat - S*hpprime
-   complex function sh(rho,cn,cnp)
+   complex function sh(rho,cn,cnp,ik)
    use constants
    use channels
    use smat
    implicit none
    real*8, intent(in) :: rho
-   integer, intent(in) :: cn,cnp
+   integer, intent(in) :: cn,cnp,ik
    real*8 rhmp,rhpp,ihmp,ihpp,L,Sr,Si
    integer ifail,m1
    double precision, dimension(101) :: fc,gc,fcp,gcp
@@ -50,7 +50,7 @@
    L=K+1.5d0
    !S=1.d0
    
-   call coulfg(en_ke(2,1)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
+   call coulfg(en_ke(2,ik)*rho,0d0,1.5d0,1.5d0,fc,gc,fcp,gcp,1,0,ifail,m1)
    
    rhmp = gcp(2)
    ihmp = -1*fcp(2)
@@ -58,7 +58,7 @@
    ihpp = fcp(2)
    
    ! get S matrix element (not diagonal)
-   call getS(Sr,Si,cn,cnp)
+   call getS(Sr,Si,cn,cnp,ik)
    
    !sh = -2*rhpp
    !sh = -Sr*rhpp + Si*ihpp
@@ -67,13 +67,13 @@
    return   
    end function sh
 
-   subroutine totalwf(ifile,cn,cnprime,nchan)
+   subroutine totalwf(ifile,cn,cnprime,nchan,ik)
    use constants
    use channels
    use gwf
    use smat
    implicit none
-   integer, intent(in) :: cn,cnprime,nchan
+   integer, intent(in) :: cn,cnprime,nchan,ik
    integer i,j,io,p(npoles),ival
    real*8 temppole,tempwf(N,2),con
    complex*8 hsh,sh,compwf(N)
@@ -115,6 +115,8 @@
    enddo 
    enddo
    rewind(10)
+
+   !print *, en_ke(1,ik)
    
    allocate (Ap(npoles))
    Ap=cmplx(0.d0,0.d0)
@@ -135,19 +137,22 @@
 	 end if 
       enddo 
       close(11)
-      !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))
-      con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-en_ke(1,1)))
+      !con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-energy))   
+   print *, "here",en_ke(1,2)
+      con = (hbc**2/(2.d0*mu))*(1.d0/(epole(ival)-en_ke(1,ik)))
       !print *, con
+      !print *, "here"
       if (file==ifile) then
-	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn)
-	 !print *, hsh(tempwf(N,1),cn)
+	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*hsh(tempwf(N,1),cn,ik)
+	 !print *, hsh(tempwf(N,1),cn,ik)
       else 
-	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(tempwf(N,1),cn,cnprime)
-	 !print *, sh(tempwf(N,1),cn,cnprime)
+	 Ap(ival) = Ap(ival) + con*tempwf(N,2)*sh(tempwf(N,1),cn,cnprime,ik)
+	 !print *, sh(tempwf(N,1),cn,cnprime,ik)
       end if 
       !print *, Ap(ival), tempwf(N,2), epole(ival)
    enddo 
    close(10)
+
    
    ! calculate total wave function
    wf=0.d0
@@ -168,5 +173,7 @@
    enddo 
    write(7,*) "&"
    close(7)
+   
+   deallocate(Ap)
    
    end subroutine totalwf

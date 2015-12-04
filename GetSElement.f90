@@ -1,7 +1,7 @@
-   subroutine getS(Sr,Si,cn,cnp)
+   subroutine getS(Sr,Si,cn,cnp,ik)
    use smat!, only: schan
    implicit none
-   integer, intent(in) :: cn,cnp
+   integer, intent(in) :: cn,cnp,ik
    real*8, intent(inout) :: Sr,Si
    integer m
    !real*8 S(schan+1)
@@ -23,8 +23,8 @@
    !   end if 
    !enddo 
    
-   Sr = S(cn+1,cnp,1)
-   Si = S(cn+1,cnp+schan,1)
+   Sr = S(cn+1,cnp,ik)
+   Si = S(cn+1,cnp+schan,ik)
    !if (cn==cnp) then
    !print *, Sr,Si,cn
    !end if

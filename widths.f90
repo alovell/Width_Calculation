@@ -9,7 +9,7 @@
    use smat
    implicit none
    real*8 partsum,Ca,gamma,temp,rad(3),mass1,mass2
-   integer io,nlines,i,j,l,narg,Knum,nchan,npot
+   integer io,nlines,i,j,l,narg,Knum,nchan,npot,ik
    character (len=10) temp2,file(99)
    character (len=20) sfile
    
@@ -53,10 +53,10 @@
    !print *, hbc,m,mu
    
    ! read in energy (scattering energy)
-   open(unit=7,file="smatrix.txt")
-   read(7,*) energy, ke
-   rewind(7)
-   close(7)
+   !open(unit=7,file="smatrix.txt")
+   !read(7,*) energy, ke
+   !rewind(7)
+   !close(7)
    !print *, energy, ke
    
    ! read input file (filename) to get number of radial points
@@ -75,11 +75,7 @@
    
    ! read in wave function file
    ! need to figure out how to read this in
-   nchan=4 ! number of channels in FaCE - small while testing
-   
-   ! allocate wf (channel wf) and chi (total wf)
-   allocate(wf(N,2))
-   allocate(chi(N,nchan+1))
+   nchan=2 ! number of channels in FaCE - small while testing
 
    ! essentially refresh the total wave function file
    ! since it will append in totalwf subroutine
@@ -89,6 +85,14 @@
    
    ! read in the S matrix elements for use in the wave function
    call readS
+   
+   ! find the width for every sturmxx energy
+   open(unit=14,file="GE.txt")
+   do ik=1,2
+   
+   ! allocate wf (channel wf) and chi (total wf)
+   allocate(wf(N,2))
+   allocate(chi(N,nchan+1))
    
    ! construct all total wave functions
    do i=1,nchan
@@ -116,7 +120,7 @@
 	 enddo 
       enddo
       ! construct the total wave function \chi for each channel, i
-      call totalwf(file(i),channum,i,nchan)
+      call totalwf(file(i),channum,i,nchan,ik)
       ! put each \chi into matrix holding all wave functions
       do j=1,N
          chi(j,1) = wf(j,1)
@@ -141,12 +145,12 @@
    ! constant for Ca
    mu1 = 0.5
    mu2 = mu/m
-   const = 2*mu/(hbc**2*en_ke(2,1)*(mu1*mu2)**(1.5))
+   const = 2*mu/(hbc**2*en_ke(2,ik)*(mu1*mu2)**(1.5))
    
    ! perform the intergration
    ! using Simpson's Rule 
    partsum = 0
-   call simpsons(partsum,nchan)
+   call simpsons(partsum,nchan,ik)
    
    ! deallocate chi
    deallocate (chi)
@@ -154,8 +158,18 @@
    Ca = const * partsum
    
    ! width
-   gamma = en_ke(2,1)*(Ca*hbc)**2/mu
+   gamma = en_ke(2,ik)*(Ca*hbc)**2/mu
    print *, "gamma=",gamma
    !print *, en_ke(2,1),ke
+   write(14,*) gamma, en_ke(1,ik)
+   print *, en_ke(1,2)
+   
+   enddo 
+   
+   ! deallocate S and en_ke
+   deallocate(S)
+   deallocate(en_ke)
+   
+   close(14)
 
    end program widths
